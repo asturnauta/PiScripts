@@ -1,0 +1,45 @@
+#!/bin/sh
+
+BTFOLDER=/btsync
+BTPATH=/opt$BTFOLDER
+BTBINARY=btsync
+BTCONF=$BTPATH/btsync.conf
+BTURL=https://download-cdn.getsync.com/stable/linux-arm/BitTorrent-Sync_arm.tar.gz
+BTTARGZ=BitTorrent-Sync_arm.tar.gz
+
+
+case "$1" in
+	install)
+		clear
+		echo "Installing BitTorrent sync"
+		mkdir $BTPATH
+		wget -P $BTPATH $BTURL
+		tar zxf $BTPATH/$BTTARGZ -C $BTPATH
+		rm $BTPATH/$BTTARGZ
+		$BTPATH/./$BTBINARY --dump-sample-config > $BTPATH/btsync.conf
+		echo "Starting BitTorrent sync"
+		$BTPATH/./$BTBINARY --config $BTCONF
+		;;
+	start)
+		echo "Starting BitTorrent sync"
+		$BTPATH/./$BTBINARY --config $BTCONF
+		;;
+	stop)
+		echo "Stopping BitTorrent sync"
+		killall $BTBINARY
+		;;
+	update)
+		clear
+		killall $BTBINARY
+		echo "Updating BitTorrent sync"
+		wget -P $BTPATH $BTURL
+		tar zxf $BTPATH/$BTTARGZ -C $BTPATH
+		rm $BTPATH/$BTTARGZ
+		$BTPATH/./$BTBINARY --config $BTCONF
+		;;
+	*)
+		printf "Usage {start|stop|install|update}"
+		exit 1
+		;;
+esac
+exit 0
